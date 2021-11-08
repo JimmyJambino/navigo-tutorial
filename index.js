@@ -1,22 +1,33 @@
 import "https://unpkg.com/navigo"  //Will create the global Navigo object used below
 
 import {
-  renderText,
-  adjustForMissingHash, loadTemplateFromDom,
+    renderText,
+    adjustForMissingHash, loadTemplateFromDom, renderTemplate, loadTemplate,
 } from "./utils.js"
+import {loadJoke} from "./pages/joke/joke";
 
 window.addEventListener("load", async () => {
 
+  const homeTemplate = loadTemplateFromDom("template-home")
+    const templateAbout = loadTemplateFromDom("template-about")
+    const productsTemplate = loadTemplateFromDom("template-products")
+    const jokeTemplate = await loadTemplate("./pages/joke/joke.html")
   const router = new Navigo("/", { hash: true });
   adjustForMissingHash()
   router
     .on({
-      "/": () => renderText("Home", "content"),
-      "/about": () => renderText("About", "content"),
+      "/": () => renderTemplate(homeTemplate, "content"),
+      "/about": () => renderTemplate(templateAbout, "content"),
       "/products": (match) => {
-        renderText("<h1>TODO</h1>", "content")
+        renderTemplate(productsTemplate, "content")
+          if (match.params){
+              document.getElementById("selected-product-id").innerText = match.params.id
+          }
       },
-      "/joke": () => renderText("Joke","content"),
+      "/joke": () => {
+          renderTemplate(jokeTemplate,"content")
+          loadJoke()
+      },
       "/product/:id": (match) => {
         renderText(`Product ID: ${match.data.id}`, "content")
       },
